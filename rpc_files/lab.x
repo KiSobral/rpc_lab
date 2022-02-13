@@ -1,7 +1,7 @@
 struct operandos{ 
     float v[10];
     int len;
-}
+};
 
 program PROG {
     version VERS {
