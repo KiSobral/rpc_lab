@@ -5,16 +5,22 @@
  */
 
 #include "lab.h"
+#include <math.h>
 
 float *
 findsmallest_110011_svc(operandos *argp, struct svc_req *rqstp)
 {
 	static float  result;
+	float smallest = INFINITY;
 
-	/*
-	 * insert server code here
-	 */
-
+	printf("------ SERVER SIDE ------\n");
+	printf("Remote call for finding the greatest element of a vector\n");
+	for (int i=0; i < argp->len; i++) {
+		printf("%f ", argp->v[i]);
+		if (argp->v[i] < smallest) smallest = argp->v[i];
+	}
+	printf("\n-------------------------\n");
+	result = smallest;
 	return &result;
 }
 
@@ -22,10 +28,15 @@ float *
 findgreatest_110011_svc(operandos *argp, struct svc_req *rqstp)
 {
 	static float  result;
+	float greatest = -INFINITY;
 
-	/*
-	 * insert server code here
-	 */
-
+	printf("------ SERVER SIDE ------\n");
+	printf("Remote call for finding the greatest element of a vector\n");
+	for (int i=0; i<argp->v[i]; i++) {
+		printf("%f ", argp->v[i]);
+		if (argp->v[i] > greatest) greatest = argp->v[i];
+	}
+	printf("\n-------------------------\n");
+	result = greatest;
 	return &result;
 }
