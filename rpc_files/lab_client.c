@@ -5,49 +5,152 @@
  */
 
 #include "lab.h"
+#include <math.h>
+#include <stdio.h>
 
 
 void
 prog_110011(char *host)
 {
-	CLIENT *clnt;
-	float  *result_1;
-	operandos  findsmallest_110011_arg;
-	float  *result_2;
-	operandos  findgreatest_110011_arg;
+  CLIENT *clnt;
+  float  *result_1;
+  operandos  findsmallest_110011_arg;
+  float  *result_2;
+  operandos  findgreatest_110011_arg;
 
-#ifndef	DEBUG
-	clnt = clnt_create (host, PROG, VERS, "udp");
-	if (clnt == NULL) {
-		clnt_pcreateerror (host);
-		exit (1);
-	}
-#endif	/* DEBUG */
+#ifndef  DEBUG
+  clnt = clnt_create (host, PROG, VERS, "udp");
+  if (clnt == NULL) {
+    clnt_pcreateerror (host);
+    exit (1);
+  }
+#endif  /* DEBUG */
 
-	result_1 = findsmallest_110011(&findsmallest_110011_arg, clnt);
-	if (result_1 == (float *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	result_2 = findgreatest_110011(&findgreatest_110011_arg, clnt);
-	if (result_2 == (float *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-#ifndef	DEBUG
-	clnt_destroy (clnt);
-#endif	 /* DEBUG */
+  result_1 = findsmallest_110011(&findsmallest_110011_arg, clnt);
+  if (result_1 == (float *) NULL) {
+    clnt_perror (clnt, "call failed");
+  }
+  result_2 = findgreatest_110011(&findgreatest_110011_arg, clnt);
+  if (result_2 == (float *) NULL) {
+    clnt_perror (clnt, "call failed");
+  }
+#ifndef  DEBUG
+  clnt_destroy (clnt);
+#endif   /* DEBUG */
 }
 
+float findSmallets(CLIENT *clnt, float *vector, int len) {
+  operandos ops;
+  float *result;
+
+  for (int i=0; i<len; i++) {
+    ops.v[i] = vector[i];
+  }
+  ops.len = len;
+  
+  printf("Client stub is about to call server stub\n");
+  result = findsmallest_110011(&ops, clnt);
+
+  if (result == NULL) {
+    printf("Something went wrong\n");
+  }
+
+  return (*result);  
+}
+
+float findGreatets(CLIENT *clnt, float *vector, int len) {
+  operandos ops;
+  float *result;
+
+  for (int i=0; i<len; i++) {
+    ops.v[i] = vector[i];
+  }
+  ops.len = len;
+  
+  printf("Client stub is about to call server stub\n");
+  result = findgreatest_110011(&ops, clnt);
+
+  if (result == NULL) {
+    printf("Something went wrong\n");
+  }
+
+  return (*result);
+}
+
+float *generateVector() {
+    float *vector;
+  vector= malloc(10*sizeof(float));
+
+    for (int i=0; i<10; i++) {
+        vector[i] = pow((i-10/2), 2);
+    }
+
+    return vector;
+}
+
+float *refineVector(float vector[]) {
+    for (int i=0; i<10; i++) {
+        vector[i] = sqrt(vector[i]);
+    }
+
+    return vector; 
+}
 
 int
 main (int argc, char *argv[])
 {
-	char *host;
+  char *host1;
+  char *host2;
+  CLIENT *clnt1;
+  CLIENT *clnt2;
 
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
-		exit (1);
-	}
-	host = argv[1];
-	prog_110011 (host);
-exit (0);
+  int client_control_flag = 1;
+
+  if (argc < 2) {
+    printf ("usage: %s server_host\n", argv[0]);
+    printf ("OR\n");
+    printf ("Usage: %s server_host1 server_host2\n", argv[0]);
+    exit (1);
+  }
+
+  host1 = argv[1];
+  
+  if (argc == 2) {
+    host2 = host1;
+  } else if (argc == 3) {
+    host2 = argv[2];
+	client_control_flag = 2;
+  } else {
+    printf ("usage: %s server_host\n", argv[0]);
+    printf ("OR\n");
+    printf ("Usage: %s server_host1 server_host2\n", argv[0]);
+    exit (1);
+  }
+  
+  
+  clnt1 = clnt_create(host1, PROG, VERS, "udp");
+  if (clnt1 == (CLIENT *) NULL) {
+    printf("Client 1 error");
+    clnt_pcreateerror(host1);
+    exit(1);
+  }
+
+  clnt2 = clnt_create(host2, PROG, VERS, "udp");
+  if (clnt2 == (CLIENT *) NULL) {
+    printf("Client 2 error");
+    clnt_pcreateerror(host2);
+    exit(1);
+  }
+
+  float *vector;
+  vector = generateVector();
+  vector = refineVector(vector);
+
+  printf("The smallest element of the vector is: %f\n", findSmallets(clnt1, vector, 10));
+  printf("The below function was called by server 1\n\n");
+
+  printf("The greatest element of the vector is: %f\n", findGreatets(clnt2, vector, 10));
+  printf("The below function was called by server %d\n\n", client_control_flag);
+
+  exit (0);
 }
