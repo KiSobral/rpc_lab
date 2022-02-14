@@ -48,7 +48,7 @@ float findSmallets(CLIENT *clnt, float *vector, int len) {
   }
   ops.len = len;
   
-  printf("Client stub is about to call server stub\n");
+  printf("Client service is about to call server for finding the smallest element\n");
   result = findsmallest_110011(&ops, clnt);
 
   if (result == NULL) {
@@ -67,7 +67,7 @@ float findGreatets(CLIENT *clnt, float *vector, int len) {
   }
   ops.len = len;
   
-  printf("Client stub is about to call server stub\n");
+  printf("Client service is about to call server for finding the greatest element\n");
   result = findgreatest_110011(&ops, clnt);
 
   if (result == NULL) {
